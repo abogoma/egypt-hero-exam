@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>اختبار: أسطورة مصرية (نسخة سحابية)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap');
+
+        :root {
+            --primary: #4ECDC4;
+            --secondary: #FFD93D;
+            --danger: #FF6B6B;
+            --dark: #0A0E27;
+            --panel-bg: #131933;
+            --panel-border: #252D50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', Arial, sans-serif;
+            color: #FFFFFF;
+            overflow: hidden;
+            background-color: var(--dark);
+        }
+
+        #app-container { width: 100vw; height: 100vh; position: relative; display: flex; flex-direction: column; }
+
+        .slide {
+            flex: 1; display: none; flex-direction: column; justify-content: flex-start; align-items: center;
+            padding: 80px 20px 130px 20px; text-align: center; box-sizing: border-box; overflow-y: auto;
+        }
+        .slide.active { display: flex; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 40px;
+            margin-top: 20px;
+        }
+
+        h1 { font-size: 46pt; margin-bottom: 20px; color: var(--secondary); text-shadow: 0 0 20px rgba(255,217,61,0.5); font-weight: 800;}
+        h2 { font-size: 36pt; margin-bottom: 15px; color: var(--primary); font-weight: 700;}
+        p, .content-text { font-size: 20pt; line-height: 1.8; max-width: 900px; margin: 0 auto 20px auto; }
+
+        .student-name-input {
+            width: 90%; max-width: 400px; padding: 18px 25px; font-size: 20pt; border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: #fff;
+            text-align: center; margin-bottom: 20px; font-family: inherit; transition: all 0.3s;
+        }
+        .student-name-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 15px rgba(78, 205, 196, 0.5); }
+
+        .btn-pro {
+            background: linear-gradient(135deg, #FFD93D, #F9A826); color: #000; border: none;
+            padding: 18px 45px; font-size: 22pt; font-weight: 800; border-radius: 15px;
+            cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 15px rgba(255,217,61,0.4);
+        }
+        .btn-pro:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px rgba(255,217,61,0.6); }
+
+        .reading-text {
+            font-size: 22pt; line-height: 2.2; text-align: justify;
+            max-width: 95%; margin: 20px auto; position: relative;
+        }
+        .reading-text::before {
+            content: '"'; position: absolute; top: -30px; right: -20px; font-size: 60pt; color: rgba(255,255,255,0.1); font-family: serif;
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; box-sizing: border-box; z-index: 100;
+            background: var(--dark); border-bottom: 1px solid var(--panel-border);
+        }
+
+        .badges-container { display: flex; gap: 15px; align-items: center;}
+        
+        .badge {
+            padding: 8px 20px; border-radius: 12px; font-size: 16pt; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px;
+        }
+        .badge-progress { background: rgba(78, 205, 196, 0.2); color: var(--primary); border: 1px solid var(--primary); cursor: pointer; transition: all 0.3s;}
+        .badge-progress:hover { background: var(--primary); color: #000; }
+        .badge-timer { background: rgba(255, 107, 107, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .badge-timer.warning { animation: pulseDanger 1s infinite; background: var(--danger); color: #fff; }
+        .badge-streak { background: rgba(255, 217, 61, 0.2); color: var(--secondary); border: 1px solid var(--secondary); display: none; }
+
+        @keyframes pulseDanger { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 15px var(--danger); } 100% { transform: scale(1); } }
+
+        .quiz-container { width: 90%; max-width: 900px; margin: 25px auto; scroll-margin-top: 130px; position: relative;}
+        .question-text { font-size: 24pt; margin-bottom: 25px; color: var(--secondary); text-align: right; line-height: 1.6; font-weight: 700;}
+        
+        .options-grid { display: flex; flex-direction: column; gap: 15px; }
+        .option-btn {
+            background: rgba(255,255,255,0.05); color: #FFF; border: 2px solid rgba(255,255,255,0.1);
+            padding: 18px 25px; font-size: 20pt; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: right; font-family: inherit; position: relative; overflow: hidden;
+        }
+        .option-btn:hover:not(.locked) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateX(-10px); }
+        .option-btn.selected-neutral { background: var(--primary); color: var(--dark); border-color: var(--primary); transform: scale(1.02); font-weight: bold;}
+        
+        .options-grid.answered .option-btn { cursor: default; opacity: 0.5; }
+        .options-grid.answered .option-btn.actual-correct { opacity: 1; border-color: var(--primary); border-width: 3px; background: rgba(78, 205, 196, 0.1); }
+        .options-grid.answered .option-btn.selected-wrong { opacity: 1; background: var(--danger); color: #fff; border-color: var(--danger); }
+        .options-grid.answered .option-btn.selected-correct { opacity: 1; background: var(--primary); color: var(--dark); border-color: var(--primary); }
+        
+        .explanation-box {
+            display: none; margin-top: 15px; padding: 15px; border-radius: 10px;
+            background: rgba(255,217,61,0.1); border-right: 4px solid var(--secondary);
+            font-size: 16pt; color: #eee; text-align: right;
+        }
+        .options-grid.answered + .explanation-box { display: block; animation: slideUpFade 0.5s ease; }
+
+        .ui-bar {
+            background: var(--dark); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--panel-border); position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 100;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 30px; font-size: 16pt; font-weight: bold; border-radius: 25px; cursor: pointer; transition: all 0.3s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .nav-btn.primary { background: var(--primary); color: var(--dark); border-color: var(--primary); }
+        .nav-btn.primary:hover { background: #3db8af; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000;
+            display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; }
+        .modal-box { text-align: center; width: 90%; max-width: 500px; position: relative; }
+        .modal-btn { background: var(--primary); color: #000; border: none; padding: 12px 25px; font-size: 18pt; font-weight: bold; border-radius: 10px; cursor: pointer; margin: 10px 5px;}
+        
+        .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 1000px; margin: 20px 0; }
+        .dash-card { text-align: center; padding: 30px; border-radius: 15px; border-top: 4px solid var(--secondary); background: rgba(255,255,255,0.05); }
+        .dash-card h3 { color: var(--primary); font-size: 18pt; margin-top:0; }
+        .dash-card .score { font-size: 38pt; font-weight: 800; color: #fff; margin: 15px 0;}
+
+        .teacher-panel-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; text-align: right; margin-top: 20px; max-height: 70vh; overflow-y: auto;}
+        .control-section h3 { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px;}
+        .students-table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden;}
+        .students-table th, .students-table td { padding: 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .students-table th { background: rgba(78, 205, 196, 0.15); color: var(--secondary); font-size: 14pt;}
+        .students-table tr:hover { background: rgba(255,255,255,0.05); }
+        .cheat-warning { color: var(--danger); font-size: 10pt; font-weight: bold; background: rgba(255,107,107,0.2); padding: 2px 5px; border-radius: 5px; margin-top: 5px; display: inline-block;}
+
+        @media (max-width: 768px) {
+            h1 { font-size: 32pt; } h2 { font-size: 26pt; }
+            p, .content-text, .option-btn { font-size: 16pt; }
+            .dashboard-grid, .teacher-panel-grid { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; gap: 10px; padding: 10px; }
+            .badges-container { flex-wrap: wrap; justify-content: center; }
+            .slide { padding-top: 120px; }
+            .ui-bar { padding: 10px; flex-direction: column; gap: 10px; }
+            .ui-bar div { width: 100%; display: flex; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
+
+    <div onclick="openTeacherLogin()" style="position: fixed; top: 15px; left: 20px; font-size: 24pt; cursor: pointer; z-index: 1000; opacity: 0.3; transition: 0.3s;">⚙️</div>
+
+    <div class="modal-overlay" id="antiCheatModal">
+        <div class="modal-box glass-panel">
+            <h2 style="color: var(--danger); margin-top: 0; font-size: 30pt;">⚠️ تحذير أمني</h2>
+            <p style="font-size: 18pt;">لقد قمت بمغادرة نافذة الاختبار! يُمنع فتح تبويبات أو برامج أخرى أثناء الحل.</p>
+            <p style="font-size: 14pt; color: var(--secondary);">تم تسجيل هذه المخالفة وإرسالها للمعلم.</p>
+            <button class="modal-btn" style="background: var(--danger); color: #fff;" onclick="closeAntiCheatModal()">أتعهد بعدم التكرار والعودة</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmSubmitModal">
+        <div class="modal-box glass-panel">
+            <h2 style="color: var(--secondary); margin-top: 0;">تسليم ورقة الإجابة؟</h2>
+            <p style="font-size: 18pt;">هل أنت متأكد من رغبتك في إنهاء الاختبار الآن؟</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button class="modal-btn" style="background: var(--danger); color: #fff;" onclick="confirmFinishExam()">نعم، إنهاء</button>
+                <button class="modal-btn" style="background: var(--primary);" onclick="cancelFinishExam()">تراجع</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="teacherLoginModal">
+        <div class="modal-box glass-panel">
+            <h2 style="color: var(--primary); margin-top: 0;">بوابة المعلم (Pro)</h2>
+            <input type="text" id="t-username" class="student-name-input" placeholder="اسم المستخدم" style="width:80%; margin-bottom: 10px;">
+            <input type="password" id="t-password" class="student-name-input" placeholder="كلمة المرور" style="width:80%;">
+            <br>
+            <button class="btn-pro" onclick="verifyTeacher()" style="padding: 10px 30px; font-size: 18pt;">دخول</button>
+            <button class="nav-btn" onclick="closeTeacherLogin()" style="margin-right: 10px;">إلغاء</button>
+            <div id="t-error" style="color: var(--danger); margin-top: 15px; display: none; font-weight: bold;">بيانات الدخول خاطئة!</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="remainingQuestionsModal">
+        <div class="modal-box glass-panel" style="max-width: 600px;">
+            <h2 style="color: var(--secondary); margin-top: 0;">خريطة الأسئلة</h2>
+            <div id="remaining-questions-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 12px; margin: 25px 0;">
+                <!-- يتم التوليد برمجياً -->
+            </div>
+            <button class="nav-btn" onclick="closeRemainingQuestionsModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <div style="font-size: 16pt; font-weight: bold; color: rgba(255,255,255,0.7);" id="slideCounter">المقدمة</div>
+        <div class="badges-container">
+            <div class="badge badge-streak" id="streakBadge" title="إجابات صحيحة متتالية!">🔥 تتابع: 0</div>
+            <div class="badge badge-progress" id="progressBadge" onclick="openRemainingQuestionsModal()" title="انقر لخريطة الأسئلة">المتبقي: 18 سؤال</div>
+            <div class="badge badge-timer" id="timerBadge">⏱️ 15:00</div>
+            <!-- مؤشر حالة الاتصال بـ Firebase -->
+            <div id="cloudStatus" style="font-size: 12pt; color: #aaa; margin-right: 10px;">☁️ جاري الاتصال...</div>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <div class="slide active" id="slide-0">
+            <h1>أسطورة مصرية</h1>
+            <h2>البطل الشهيد / أحمد المنسي</h2>
+            <p style="color: #ccc;">اختبار الفهم القرائي المتقدم - النسخة الاحترافية (سحابي)</p>
+            
+            <div class="glass-panel" style="width: 100%; max-width: 500px;">
+                <input type="text" id="studentNameInput" class="student-name-input" placeholder="اسمك الثلاثي..." autocomplete="off">
+                <input type="text" id="studentCodeInput" class="student-name-input" placeholder="رقم الجلوس..." autocomplete="off">
+                <div id="login-error-msg" style="color: var(--danger); font-size: 16pt; margin-bottom: 15px; font-weight: bold; display: none;"></div>
+                <button class="btn-pro" id="btnStartExam" onclick="startExam()" disabled style="opacity: 0.5; cursor: not-allowed;">جاري التحميل...</button>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-1">
+            <h2>الفقرة الأولى: النشأة والصفات</h2>
+            <div class="glass-panel reading-text">
+                «نَشَأَ فِي أُسْرَةٍ غَرَسَتْ فِيهِ الْقِيَمَ الدِّينِيَّةَ السَّمْحَةَ وَحُبَّ الْوَطَنِ، وَعَلَّمَتْهُ كَيْفَ يَكُونُ إِنْسَانًا قَبْلَ أَنْ يَكُونَ جُنْدِيًّا، وَكَانَ حَرِيصًا عَلَى أَنْ يَتَسَلَّحَ بِالْعِلْمِ إِيمَانًا مِنْهُ بِأَنَّ الْقَائِدَ النَّاجِحَ لَا بُدَّ أَنْ يَجْمَعَ بَيْنَ الشَّجَاعَةِ وَالْعِلْمِ لِخِدْمَةِ وَطَنِهِ؛ فَحَصَلَ عَلَى دَوْرَاتٍ مُتَقَدِّمَةٍ فِي مَجَالِ الْعَمَلِيَّاتِ الْخَاصَّةِ، وَنَالَ دَرَجَةَ الْمَاجِسْتِيرِ فِي الْعُلُومِ الْعَسْكَرِيَّةِ. <br><br>اتَّسَمَتْ شَخْصِيَّتُهُ بِالْجِدِّيَّةِ وَالِالْتِزَامِ وَالتَّوَاضُعِ، وَكَانَ مَعْرُوفًا بِعَلَاقَتِهِ الْإِنْسَانِيَّةِ بِجُنُودِهِ... وَكَانَ بَارًّا بِوَالِدَيْهِ، وَخَيْرَ عَوْنٍ لِمَنْ يَحْتَاجُ لِلْمُسَاعَدَةِ».
+            </div>
+            <p>اقرأ الفقرة بتركيز ثم انتقل للأسئلة.</p>
+        </div>
+
+        <div class="slide" id="slide-2">
+            <h2>أسئلة اللغويات (الفقرة الأولى)</h2>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">1. مرادف كلمة «غَرَسَتْ» في جملة (أُسْرَةٍ غَرَسَتْ فِيهِ الْقِيَمَ):</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="false">قالت، وكررت</button>
+                    <button class="option-btn" data-correct="false">نصحت، وأخبرت</button>
+                    <button class="option-btn" data-correct="true">ثَبَّتت، وأكَّدت</button>
+                    <button class="option-btn" data-correct="false">تابعت، ولاحظت</button>
+                </div>
+                <div class="explanation-box">التفسير: الغرس في الأصل للزرع، ويستعار لتثبيت وتأكيد القيم والمبادئ في النفوس بعمق.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">2. مضاد كلمة «انْشِغَالِهِ»:</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="false">إهماله</button>
+                    <button class="option-btn" data-correct="true">تفرُّغه</button>
+                    <button class="option-btn" data-correct="false">نسيانه</button>
+                </div>
+                <div class="explanation-box">التفسير: الانشغال هو الامتلاء بالعمل، وعكسه التفرغ وهو الخلو منه.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">3. ما جمع كلمة «بَارًّا»؟</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="true">بَرَرَة أو أبْرار</button>
+                    <button class="option-btn" data-correct="false">أبرياء</button>
+                    <button class="option-btn" data-correct="false">برورًا</button>
+                </div>
+                <div class="explanation-box">التفسير: جمع كلمة بَار هو بَرَرَة (مثل: سَفَرَة كِرَامٍ بَرَرَة) أو أَبْرَار.</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-3">
+            <h2>الفهم والاستيعاب (الفقرة الأولى)</h2>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">4. كيف جمع المنسي بين الشجاعة والعلم؟</div>
+                <div class="options-grid" data-category="comprehension">
+                    <button class="option-btn" data-correct="true">حَصَلَ على دورات متقدمة ونال الماجستير العسكري</button>
+                    <button class="option-btn" data-correct="false">اكتفى بالتدريبات الميدانية في سيناء</button>
+                    <button class="option-btn" data-correct="false">درس الطب والهندسة بجانب العسكرية</button>
+                </div>
+                <div class="explanation-box">التفسير: النص ذكر صراحة حصوله على دورات خاصة ودرجة الماجستير في العلوم العسكرية.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">5. من الدلائل على إنسانية (المنسي) مع جنوده:</div>
+                <div class="options-grid" data-category="comprehension">
+                    <button class="option-btn" data-correct="false">إعفاؤهم من المهام الصعبة</button>
+                    <button class="option-btn" data-correct="true">يعاملهم كإخوة ولا يأكل حتى يتأكد أنهم تناولوا طعامهم</button>
+                    <button class="option-btn" data-correct="false">تجاهل أحوالهم الشخصية للتركيز في المعركة</button>
+                </div>
+                <div class="explanation-box">التفسير: القائد الحق هو من يهتم برجاله ورفقائه في السلاح ويعاملهم كعائلة.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">6. علامَ يدل قوله: «علَّمته كيف يكون إنساناً قبل أن يكون جندياً»؟</div>
+                <div class="options-grid" data-category="comprehension">
+                    <button class="option-btn" data-correct="false">ضعف التدريب العسكري</button>
+                    <button class="option-btn" data-correct="true">أهمية الأخلاق والقيم الإنسانية لتوجيه القوة لخدمة الحق</button>
+                    <button class="option-btn" data-correct="false">تفضيل الحياة المدنية على العسكرية</button>
+                </div>
+                <div class="explanation-box">التفسير: القوة بدون إنسانية وأخلاق تتحول إلى بطش، فالإنسانية هي الضابط للقوة.</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-4">
+            <h2>الفقرة الثانية: البطولة والتضحية</h2>
+            <div class="glass-panel reading-text">
+                «كَانَ قَائِدًا لَا يَعْرِفُ التَّرَاجُعَ... خَاضَ بُطُولَاتٍ ضِدَّ بُؤَرِ الْإِرْهَابِ فِي سِينَاءَ، مِنْهَا: عَمَلِيَّةُ تَطْهِيرٍ فِي "الشَّيْخ زُوَيِّد"، الَّتِي أَسْفَرَتْ عَنْ الْقَضَاءِ عَلَى قِيَادَاتٍ إِرْهَابِيَّةٍ... دَافِعُهُ إِيمَانُهُ بِأَنَّ سِينَاءَ جُزْءٌ غَالٍ وَبَوَّابَةُ مِصْرَ الشَّرْقِيَّةُ.<br><br>حِينَ تَعَرَّضَ كَمِينُ الْبَرْثِ لِهُجُومٍ غَادِرٍ... تَصَدَّى بِشَجَاعَةٍ رَافِضًا الِانْسِحَابَ. وَفِي لَحْظَةٍ اسْتِثْنَائِيَّةٍ، صَعِدَ لِلسَّطْحِ مُظْهِرًا نَفْسَهُ لِيَشْغَلَ الْإِرْهَابِيِّينَ، وَيَمْنَحَ جُنُودَهُ فُرْصَةً لِنَقْلِ الْمُصَابِينَ. ظَلَّ يُقَاتِلُ حَتَّى لَقِيَ رَبَّهُ شَهِيدًا».
+            </div>
+        </div>
+
+        <div class="slide" id="slide-5">
+            <h2>أسئلة اللغويات (الفقرة الثانية)</h2>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">7. معنى: «أَسْفَرَتْ عَنْ»</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="true">أدّت إلى ونَتَجَ عنها</button>
+                    <button class="option-btn" data-correct="false">أخفت وغطت</button>
+                    <button class="option-btn" data-correct="false">تراجعت عن</button>
+                </div>
+                <div class="explanation-box">التفسير: أسفرت النتيجة عن كذا أي كشفت وأدت ونتج عنها هذا الأمر.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">8. استخرج من الفقرة كلمة بمعنى: «نَادِرَة وغير عادية»</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="false">مُفَخَّخَة</button>
+                    <button class="option-btn" data-correct="true">اسْتِثْنَائِيَّة</button>
+                    <button class="option-btn" data-correct="false">غَادِرَة</button>
+                </div>
+                <div class="explanation-box">التفسير: الشيء الاستثنائي هو الخارج عن المألوف أو النادر الحدوث كشجاعته.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">9. من خلال الفقرة، الكلمتان اللتان بينهما (تضاد):</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="true">يَتَقَدَّم / التَّرَاجُع</button>
+                    <button class="option-btn" data-correct="false">الشجاعة / البطولة</button>
+                    <button class="option-btn" data-correct="false">كمين / هجوم</button>
+                </div>
+                <div class="explanation-box">التفسير: التقدم هو السير للأمام، والتراجع هو الانسحاب للخلف (علاقة تضاد).</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-6">
+            <h2>الفهم والاستيعاب (الفقرة الثانية)</h2>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">10. ما الدافع الذي حفّز المنسي لحماية سيناء بشراسة؟</div>
+                <div class="options-grid" data-category="comprehension">
+                    <button class="option-btn" data-correct="false">الحصول على ترقية ورتبة أعلى</button>
+                    <button class="option-btn" data-correct="true">إيمانه بأن سيناء جزء غالٍ من تراب مصر ولا يجوز التفريط فيها</button>
+                    <button class="option-btn" data-correct="false">إثبات شجاعته فقط أمام قادته</button>
+                </div>
+                <div class="explanation-box">التفسير: العقيدة الوطنية الصادقة هي المحرك الأساسي لأبطال القوات المسلحة.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">11. لماذا وُصفت لحظة صعوده للسطح بأنها "استثنائية"؟</div>
+                <div class="options-grid" data-category="comprehension">
+                    <button class="option-btn" data-correct="true">لأنه عرّض نفسه للموت عمداً ليجذب النيران وينقذ زملائه المصابين</button>
+                    <button class="option-btn" data-correct="false">لأنه استخدم سلاحاً جديداً لم يُستخدم من قبل</button>
+                    <button class="option-btn" data-correct="false">لأنه استطاع الهروب من الموقع بمفرده من السطح</button>
+                </div>
+                <div class="explanation-box">التفسير: التضحية بالنفس من أجل نجاة الآخرين هي أسمى معاني الفداء والاستثناء في الشجاعة.</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-7">
+            <h2>الفقرة الثالثة: الخلود والشهادة</h2>
+            <div class="glass-panel reading-text" style="border-color: var(--primary);">
+                «لَمْ تَكُنْ بَطُولَةُ الْمَنْسِيِّ مُجَرَّدَ قِصَّةٍ تَنْتَهِي بِاسْتِشْهَادِهِ، بَلْ أَصْبَحَتْ أَيْقُونَةً لِلْفِدَاءِ وَالتَّضْحِيَةِ. تَرَكَ خَلْفَهُ جِيلًا مِنَ الْأَبْطَالِ الَّذِينَ اسْتَلْهَمُوا مِنْهُ مَعْنَى الْوَطَنِيَّةِ، وَأَدْرَكُوا أَنَّ الْأَوْطَانَ لَا تُبْنَى إِلَّا بِالدِّمَاءِ الزَّكِيَّةِ. قَدَّمَ الْمَنْسِيُّ رُوحَهُ فِدَاءً لِمِصْرَ، لِيَكْتُبَ اسْمَهُ بِأَحْرُفٍ مِنْ نُورٍ فِي سِجِلَّاتِ الشَّرَفِ الْعَسْكَرِيِّ، وَيَبْقَى حَيًّا فِي وِجْدَانِ كُلِّ مِصْرِيٍّ حُرٍّ».
+            </div>
+            <p style="color: var(--primary); font-weight:bold;">اقرأ الفقرة الإضافية بتركيز.</p>
+        </div>
+
+        <div class="slide" id="slide-8">
+            <h2>أسئلة الخاتمة (الفقرة الثالثة)</h2>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">12. المراد بكلمة «أَيْقُونَةً» في سياق النص:</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="false">صورة فنية قديمة</button>
+                    <button class="option-btn" data-correct="true">رمزاً ونموذجاً يُحتذى به</button>
+                    <button class="option-btn" data-correct="false">أسطورة خيالية</button>
+                </div>
+                <div class="explanation-box">التفسير: رغم أن الأيقونة في الأصل صورة، إلا أنها تُستخدم أدبياً بمعنى "الرمز البارز" والنموذج.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">13. مفرد كلمة «سِجِلَّاتِ»:</div>
+                <div class="options-grid" data-category="linguistics">
+                    <button class="option-btn" data-correct="true">سِجِلّ</button>
+                    <button class="option-btn" data-correct="false">سَاجِل</button>
+                    <button class="option-btn" data-correct="false">مُسَجَّل</button>
+                </div>
+                <div class="explanation-box">التفسير: سِجِلّ هو الكتاب الذي يُكتب فيه، وجمعها سِجلات.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">14. ماذا ترك المنسي خلفه كما فهمت من الخاتمة؟</div>
+                <div class="options-grid" data-category="comprehension">
+                    <button class="option-btn" data-correct="false">ثروة مالية طائلة لأبنائه</button>
+                    <button class="option-btn" data-correct="true">جيلاً من الأبطال يستلهمون وطنيته وتضحيته</button>
+                    <button class="option-btn" data-correct="false">مباني عسكرية ضخمة باسمه</button>
+                </div>
+                <div class="explanation-box">التفسير: الأثر المعنوي (جيل الأبطال) هو أعظم ما يتركه الشهيد للأمة.</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-9">
+            <h2>أسئلة الاستنتاج (صح أم خطأ)</h2>
+            <p style="color: var(--primary);">بناءً على فهمك الشامل للنص بأكمله:</p>
+            
+            <div class="glass-panel quiz-container">
+                <div class="question-text">15. شهدت منطقة «الشيخ زويد» إحدى بطولات المنسي الناجحة.</div>
+                <div class="options-grid" data-category="deduction" style="flex-direction: row;">
+                    <button class="option-btn" data-correct="true" style="flex:1; text-align:center;">✅ صحيحة</button>
+                    <button class="option-btn" data-correct="false" style="flex:1; text-align:center;">❌ خاطئة</button>
+                </div>
+                <div class="explanation-box">التفسير: نعم، النص ذكر عملية تطهير ناجحة في الشيخ زويد.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">16. اضطر المنسي للانسحاب من كمين البرث حفاظاً على الأرواح.</div>
+                <div class="options-grid" data-category="deduction" style="flex-direction: row;">
+                    <button class="option-btn" data-correct="false" style="flex:1; text-align:center;">✅ صحيحة</button>
+                    <button class="option-btn" data-correct="true" style="flex:1; text-align:center;">❌ خاطئة</button>
+                </div>
+                <div class="explanation-box">التفسير: العبارة خاطئة، النص أكّد أنه رفض الانسحاب وظل يقاتل.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">17. كان المنسي يتقدم الصفوف ولا يترك رجاله.</div>
+                <div class="options-grid" data-category="deduction" style="flex-direction: row;">
+                    <button class="option-btn" data-correct="true" style="flex:1; text-align:center;">✅ صحيحة</button>
+                    <button class="option-btn" data-correct="false" style="flex:1; text-align:center;">❌ خاطئة</button>
+                </div>
+                <div class="explanation-box">التفسير: من صفاته القيادية المذكورة في الفقرة الثانية التقدم وعدم ترك الرجال.</div>
+            </div>
+            <div class="glass-panel quiz-container">
+                <div class="question-text">18. تُبنى الأوطان الحرة بالتضحيات والدماء الزكية للأبطال.</div>
+                <div class="options-grid" data-category="deduction" style="flex-direction: row;">
+                    <button class="option-btn" data-correct="true" style="flex:1; text-align:center;">✅ صحيحة</button>
+                    <button class="option-btn" data-correct="false" style="flex:1; text-align:center;">❌ خاطئة</button>
+                </div>
+                <div class="explanation-box">التفسير: هذا هو الدرس المستفاد والاستنتاج الأهم من التضحية المذكور في الخاتمة.</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-10">
+            <h1 id="finalGreeting" style="font-size: 50pt; margin-bottom: 5px;">اكتمل الاختبار!</h1>
+            <p id="finalFeedback" style="color: var(--primary); font-weight: bold;"></p>
+            
+            <div class="glass-panel dashboard-grid">
+                <div class="dash-card">
+                    <h3>اللغويات والمفردات</h3>
+                    <div class="score" id="scoreLinguistics">0/8</div>
+                </div>
+                <div class="dash-card">
+                    <h3>الفهم والاستيعاب</h3>
+                    <div class="score" id="scoreComprehension">0/6</div>
+                </div>
+                <div class="dash-card">
+                    <h3>الاستنتاج والتذوق</h3>
+                    <div class="score" id="scoreDeduction">0/4</div>
+                </div>
+            </div>
+            
+            <div class="glass-panel" style="margin-top: 0; padding: 20px 40px; display: inline-block;">
+                <div style="font-size: 26pt; font-weight: bold;">
+                    الدرجة الكلية: <span id="scoreTotal" style="color:var(--secondary);">0/18</span> 
+                    <span style="color:#aaa; font-size: 20pt;">(<span id="scorePercent">0</span>%)</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px;">
+                <button class="btn-pro" id="btnDownloadCert" onclick="downloadCertificate()" style="display:none; background: linear-gradient(135deg, #4ECDC4, #2ab7a9); color:#fff;">⬇️ تحميل الشهادة الاحترافية</button>
+                <button class="nav-btn primary" id="btnReviewMistakes" onclick="reviewExam()" style="display:none; padding: 15px;">🔍 عرض التفسيرات ومراجعة إجاباتي</button>
+                <button class="nav-btn" onclick="exitToHome()" style="background: var(--danger); border-color: var(--danger); padding: 15px;">🚪 خروج للرئيسية</button>
+            </div>
+            
+            <canvas id="certCanvas" width="900" height="600" style="display:none; margin-top:20px; max-width:100%; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></canvas>
+        </div>
+
+        <div class="slide" id="slide-11" style="align-items: stretch; padding: 80px 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1 style="margin: 0; font-size: 32pt; text-align: right;">لوحة التحكم الاحترافية 👨‍🏫</h1>
+                <button class="nav-btn" style="background: var(--danger); border: none;" onclick="logoutTeacher()">تسجيل خروج</button>
+            </div>
+
+            <div class="teacher-panel-grid">
+                <!-- الإعدادات -->
+                <div class="glass-panel control-section">
+                    <h3>إعدادات الاختبار</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                        <div>
+                            <label style="color: var(--secondary); display: block; margin-bottom: 5px; text-align: right;">مدة الاختبار (بالدقائق):</label>
+                            <input type="number" id="setting-duration" class="student-name-input" value="15" min="1" style="width: 100%; box-sizing: border-box; font-size: 16pt;">
+                        </div>
+                        <div>
+                            <label style="color: var(--secondary); display: block; margin-bottom: 5px; text-align: right;">تاريخ ووقت البدء:</label>
+                            <input type="datetime-local" id="setting-start" class="student-name-input" style="width: 100%; box-sizing: border-box; font-size: 16pt; color-scheme: dark;">
+                        </div>
+                        <div>
+                            <label style="color: var(--secondary); display: block; margin-bottom: 5px; text-align: right;">تاريخ ووقت الانتهاء:</label>
+                            <input type="datetime-local" id="setting-end" class="student-name-input" style="width: 100%; box-sizing: border-box; font-size: 16pt; color-scheme: dark;">
+                        </div>
+                        <button class="btn-pro" style="width: 100%; font-size: 14pt; padding: 12px; margin-top: 10px;" onclick="saveExamSettings()">💾 حفظ الإعدادات بالسحابة</button>
+                        <div id="settings-msg" style="color: var(--primary); margin-top: 10px; display: none; font-weight: bold; text-align: center;">تم حفظ الإعدادات بنجاح!</div>
+                    </div>
+
+                    <h3>إدارة الطلاب (توليد الأكواد)</h3>
+                    <textarea id="new-student-name" class="student-name-input" placeholder="ألصق أسماء الطلاب هنا (كل اسم في سطر جديد)..." style="width:100%; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
+                    <button class="btn-pro" style="width: 100%; font-size: 14pt; padding: 12px; margin-bottom: 15px;" onclick="generateStudentCode()">➕ إضافة الطلاب للسحابة</button>
+
+                    <h3 style="margin-top: 30px;">طباعة</h3>
+                    <button class="nav-btn" style="width: 100%; background: #4a69bd; border: none; margin-bottom: 10px;" onclick="printStudentsList()">🖨️ طباعة أرقام الجلوس</button>
+                </div>
+
+                <!-- المراقبة الحية -->
+                <div class="glass-panel control-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="border: none; margin: 0;">المراقبة الحية للطلاب ☁️ (Real-time)</h3>
+                        <div style="font-size: 12pt; color: var(--primary);">تتحدث البيانات تلقائياً</div>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="students-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم الطالب</th>
+                                    <th>الكود</th>
+                                    <th>الحالة</th>
+                                    <th>المحاولات والغش</th>
+                                    <th>النتيجة</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-monitor-body">
+                                <!-- Data injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-bar" id="mainUiBar">
+            <div style="color: var(--primary); font-size: 16pt; font-weight: bold;">أ/ محمود أبو جمعة</div>
+            <div style="display: flex; gap: 15px;">
+                <button class="nav-btn" id="btn-next" onclick="nextSlide()" style="display: none;">التالي ⮜</button>
+                <button class="nav-btn" id="btn-prev" onclick="prevSlide()" style="display: none;">⮞ السابق</button>
+                <button class="nav-btn" id="btn-finish" onclick="promptFinishExam()" style="display: none; background: var(--danger); border-color: var(--danger);">إنهاء وتسليم 🏁</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Exam Variables
+        const totalQuestions = 18;
+        const totalSlides = 12; 
+        
+        let currentSlide = 0;
+        let studentName = "";
+        let studentCurrentCode = "";
+        let isExamActive = false;
+        let isReviewMode = false;
+        
+        // Gamification Variables
+        let currentStreak = 0;
+        let cheatAttempts = 0;
+        
+        let studentAnswers = {};
+        let scores = { linguistics: { v: 0, m: 8 }, comprehension: { v: 0, m: 6 }, deduction: { v: 0, m: 4 } };
+        let timerInterval, timeLeft = 900;
+        let examSettings = { duration: 15, startTime: "", endTime: "" };
+        let studentsListCache = [];
+
+        // Firebase Setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-pro-exam';
+        const firebaseConfig = {
+  apiKey: "AIzaSyBCuDQXeiuMbO36TDnQwPSulgtNxwaxToM",
+  authDomain: "my-pro-exams.firebaseapp.com",
+  databaseURL: "https://my-pro-exams-default-rtdb.firebaseio.com",
+  projectId: "my-pro-exams",
+  storageBucket: "my-pro-exams.firebasestorage.app",
+  messagingSenderId: "146200165720",
+  appId: "1:146200165720:web:5488a9274ff6a646abf92d"
+};        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+
+        // Base Paths as per strictly mandated rules
+        const studentsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'students');
+        const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'examSettings');
+
+        async function authenticate() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                currentUser = auth.currentUser;
+                document.getElementById('cloudStatus').innerText = "☁️ متصل";
+                document.getElementById('cloudStatus').style.color = "var(--primary)";
+                
+                const btnStart = document.getElementById('btnStartExam');
+                btnStart.disabled = false;
+                btnStart.innerText = "دخول الاختبار 🚀";
+                btnStart.style.opacity = "1";
+                btnStart.style.cursor = "pointer";
+
+                setupCloudListeners();
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                document.getElementById('cloudStatus').innerText = "❌ خطأ بالاتصال";
+                document.getElementById('cloudStatus').style.color = "var(--danger)";
+            }
+        }
+
+        function setupCloudListeners() {
+            if (!currentUser) return;
+            
+            // Listen for exam settings
+            onSnapshot(settingsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    examSettings = docSnap.data();
+                    if(currentSlide === 11) {
+                        document.getElementById('setting-duration').value = examSettings.duration;
+                        document.getElementById('setting-start').value = examSettings.startTime;
+                        document.getElementById('setting-end').value = examSettings.endTime;
+                    }
+                }
+            }, (error) => console.error("Settings Sync Error:", error));
+
+            // Listen for students list (For teacher dashboard)
+            onSnapshot(studentsCollectionRef, (snapshot) => {
+                studentsListCache = [];
+                snapshot.forEach(doc => {
+                    studentsListCache.push(doc.data());
+                });
+                if(currentSlide === 11) {
+                    window.refreshMonitor();
+                }
+            }, (error) => console.error("Students Sync Error:", error));
+        }
+
+        // Exposing specific functions to window scope for HTML inline calls
+        window.updateStudentData = async function(updates) {
+            if (!currentUser || !studentCurrentCode) return;
+            const studentRef = doc(db, 'artifacts', appId, 'public', 'data', 'students', studentCurrentCode);
+            try {
+                await updateDoc(studentRef, updates);
+            } catch (error) {
+                console.error("Error updating student data in cloud", error);
+            }
+        }
+
+        window.addEventListener('blur', function() {
+            if(isExamActive && !isReviewMode) {
+                cheatAttempts++;
+                window.updateStudentData({ cheatAttempts: cheatAttempts });
+                showAntiCheatModal();
+            }
+        });
+
+        function showAntiCheatModal() {
+            const m = document.getElementById('antiCheatModal');
+            m.style.display = 'flex';
+            setTimeout(() => m.classList.add('show'), 10);
+            playTone('error');
+        }
+        window.closeAntiCheatModal = function() {
+            const m = document.getElementById('antiCheatModal');
+            m.classList.remove('show');
+            setTimeout(() => m.style.display = 'none', 300);
+        }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            if (type === 'select') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'streak') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                osc.frequency.linearRampToValueAtTime(1600, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        window.startExam = async function() {
+            if(!currentUser) return; // Wait for Firebase connection
+            const inputName = document.getElementById('studentNameInput').value.trim();
+            const inputCode = document.getElementById('studentCodeInput').value.trim();
+            const errorMsg = document.getElementById('login-error-msg');
+            
+            if (!inputName || !inputCode) { errorMsg.innerText = "أدخل الاسم ورقم الجلوس!"; errorMsg.style.display = 'block'; return; }
+
+            try {
+                // Fetch student from Cloud
+                const studentRef = doc(db, 'artifacts', appId, 'public', 'data', 'students', inputCode);
+                const studentSnap = await getDoc(studentRef);
+
+                if (!studentSnap.exists() || studentSnap.data().name !== inputName) { 
+                    errorMsg.innerText = "الاسم أو الكود غير صحيح في السحابة!"; errorMsg.style.display = 'block'; return; 
+                }
+                
+                let s = studentSnap.data();
+                if (s.status === "انتهى") { errorMsg.innerText = "لقد أديت الاختبار مسبقاً!"; errorMsg.style.display = 'block'; return; }
+
+                // Check availability window
+                let now = new Date().getTime();
+                if (examSettings.startTime) {
+                    if (now < new Date(examSettings.startTime).getTime()) {
+                        let st = new Date(examSettings.startTime).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+                        errorMsg.innerText = `الاختبار لم يبدأ بعد. موعد البدء: ${st}`;
+                        errorMsg.style.display = 'block';
+                        return;
+                    }
+                }
+                if (examSettings.endTime) {
+                    if (now > new Date(examSettings.endTime).getTime()) {
+                        errorMsg.innerText = "انتهى وقت إتاحة الاختبار ولا يمكن الدخول الآن!";
+                        errorMsg.style.display = 'block';
+                        return;
+                    }
+                }
+
+                // Randomize options for anti-cheat
+                document.querySelectorAll('.options-grid').forEach(grid => {
+                    let opts = Array.from(grid.children);
+                    opts.sort(() => Math.random() - 0.5).forEach(o => grid.appendChild(o));
+                });
+
+                studentName = inputName; studentCurrentCode = inputCode;
+                isExamActive = true; cheatAttempts = s.cheatAttempts || 0; currentStreak = 0;
+                errorMsg.style.display = 'none';
+                studentAnswers = {};
+                
+                window.updateStudentData({ status: "قيد الاختبار", answered: 0 });
+
+                document.getElementById('timerBadge').style.display = 'flex';
+                document.getElementById('progressBadge').style.display = 'flex';
+                
+                startTimer();
+                window.nextSlide();
+
+            } catch (err) {
+                console.error("Login Check Error", err);
+                errorMsg.innerText = "حدث خطأ في الاتصال بالسحابة.";
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function startTimer() {
+            timeLeft = (examSettings.duration || 15) * 60;
+            const t = document.getElementById('timerBadge');
+            t.classList.remove('warning');
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) { clearInterval(timerInterval); finishExam(); return; }
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
+                t.innerText = `⏱️ ${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                if (timeLeft <= 60) t.classList.add('warning');
+            }, 1000);
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById('slide-' + currentSlide).classList.add('active');
+
+            const slideNames = ["الدخول", "فقرة 1", "أسئلة ف1", "أسئلة ف1", "فقرة 2", "أسئلة ف2", "أسئلة ف2", "فقرة 3", "أسئلة ف3", "استنتاج", "النتيجة", "لوحة المعلم"];
+            document.getElementById('slideCounter').innerText = slideNames[currentSlide] || "";
+
+            const btnNext = document.getElementById('btn-next');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnFinish = document.getElementById('btn-finish');
+            const uiBar = document.getElementById('mainUiBar');
+
+            if (currentSlide === 0 || currentSlide >= 10) {
+                uiBar.style.display = currentSlide===11 ? 'none' : 'flex';
+                btnNext.style.display = 'none'; btnPrev.style.display = 'none'; btnFinish.style.display = 'none';
+            } else {
+                uiBar.style.display = 'flex';
+                btnNext.style.display = currentSlide === 9 ? 'none' : 'block';
+                btnPrev.style.display = currentSlide === 1 ? 'none' : 'block';
+                btnFinish.style.display = isReviewMode ? 'none' : 'block';
+            }
+        }
+        window.nextSlide = function() { if(currentSlide < totalSlides-1) { currentSlide++; updateUI(); } }
+        window.prevSlide = function() { if(currentSlide > 1) { currentSlide--; updateUI(); } }
+
+        function setupQuizzes() {
+            document.querySelectorAll('.quiz-container').forEach((qc, index) => {
+                qc.setAttribute('data-q-index', index);
+                qc.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if(!isExamActive) return;
+                        
+                        const grid = this.parentElement;
+                        const qIndex = grid.parentElement.getAttribute('data-q-index');
+                        const isCorrect = this.getAttribute('data-correct') === 'true';
+
+                        grid.querySelectorAll('.option-btn').forEach(o => o.classList.remove('selected-neutral'));
+                        this.classList.add('selected-neutral');
+
+                        if(studentAnswers[qIndex]) {
+                            currentStreak = 0; 
+                        } else {
+                            if(isCorrect) { currentStreak++; if(currentStreak > 1) playTone('streak'); else playTone('select'); }
+                            else { currentStreak = 0; playTone('select'); }
+                        }
+
+                        const sb = document.getElementById('streakBadge');
+                        if(currentStreak > 1) {
+                            sb.style.display = 'flex'; sb.innerText = `🔥 تتابع: x${currentStreak}`;
+                            sb.style.transform = 'scale(1.1)'; setTimeout(()=>sb.style.transform='scale(1)', 200);
+                        } else { sb.style.display = 'none'; }
+
+                        studentAnswers[qIndex] = { correct: isCorrect, cat: grid.getAttribute('data-category') };
+                        let answered = Object.keys(studentAnswers).length;
+                        
+                        document.getElementById('progressBadge').innerText = answered < totalQuestions ? `المتبقي: ${totalQuestions - answered}` : 'اكتملت ✅';
+                        window.updateStudentData({ answered: answered });
+                    });
+                });
+            });
+        }
+
+        window.promptFinishExam = function() { showModal('confirmSubmitModal'); }
+        window.cancelFinishExam = function() { hideModal('confirmSubmitModal'); }
+        window.confirmFinishExam = function() { hideModal('confirmSubmitModal'); finishExam(); }
+        
+        window.openRemainingQuestionsModal = function() {
+            if(!isExamActive && !isReviewMode) return;
+            const grid = document.getElementById('remaining-questions-grid');
+            grid.innerHTML = "";
+            document.querySelectorAll('.quiz-container').forEach((qc, idx) => {
+                let isAns = studentAnswers.hasOwnProperty(idx);
+                let btn = document.createElement('button');
+                btn.className = 'nav-btn'; btn.style.padding = '10px 5px'; btn.style.margin = '0'; btn.style.fontSize = '14pt';
+                if(isAns) { btn.style.background = 'rgba(78,205,196,0.2)'; btn.style.color='var(--primary)'; btn.style.borderColor='var(--primary)'; btn.innerText=`س${idx+1} ✓`; }
+                else { btn.style.background = 'var(--danger)'; btn.style.color='#fff'; btn.innerText=`س${idx+1}`; }
+                btn.onclick = () => { hideModal('remainingQuestionsModal'); jumpToQ(idx); };
+                grid.appendChild(btn);
+            });
+            showModal('remainingQuestionsModal');
+        }
+        window.closeRemainingQuestionsModal = function() { hideModal('remainingQuestionsModal'); }
+        
+        function jumpToQ(idx) {
+            let qc = document.querySelectorAll('.quiz-container')[idx];
+            if(qc) {
+                currentSlide = parseInt(qc.closest('.slide').id.replace('slide-',''));
+                updateUI();
+                setTimeout(() => qc.scrollIntoView({behavior:'smooth', block:'center'}), 100);
+            }
+        }
+
+        function showModal(id) {
+            let m = document.getElementById(id); m.style.display='flex'; setTimeout(()=>m.classList.add('show'), 10);
+        }
+        function hideModal(id) {
+            let m = document.getElementById(id); m.classList.remove('show'); setTimeout(()=>m.style.display='none', 300);
+        }
+
+        function finishExam() {
+            clearInterval(timerInterval); isExamActive = false;
+            currentSlide = 10; updateUI();
+            
+            document.getElementById('timerBadge').style.display = 'none';
+            document.getElementById('progressBadge').style.display = 'none';
+            document.getElementById('streakBadge').style.display = 'none';
+
+            scores.linguistics.v = 0; scores.comprehension.v = 0; scores.deduction.v = 0;
+            for(let k in studentAnswers) {
+                if(studentAnswers[k].correct) scores[studentAnswers[k].cat].v++;
+            }
+
+            let tot = scores.linguistics.v + scores.comprehension.v + scores.deduction.v;
+            let perc = Math.round((tot / totalQuestions) * 100);
+
+            document.getElementById('scoreLinguistics').innerText = `${scores.linguistics.v}/${scores.linguistics.m}`;
+            document.getElementById('scoreComprehension').innerText = `${scores.comprehension.v}/${scores.comprehension.m}`;
+            document.getElementById('scoreDeduction').innerText = `${scores.deduction.v}/${scores.deduction.m}`;
+            document.getElementById('scoreTotal').innerText = `${tot}/${totalQuestions}`;
+            document.getElementById('scorePercent').innerText = perc;
+
+            let feedback = perc >= 90 ? "أداء مبهر يا بطل! 🥇" : (perc >= 70 ? "عمل جيد! 🥈" : "تحتاج للمزيد من التركيز المقاتل! 💪");
+            document.getElementById('finalFeedback').innerText = feedback;
+
+            if(perc >= 90) startConfetti();
+            
+            document.getElementById('btnReviewMistakes').style.display = 'block';
+            window.updateStudentData({ status: "انتهى", score: `${tot}/${totalQuestions} (${perc}%)` });
+
+            drawCertificate(studentName, perc, tot, totalQuestions);
+        }
+
+        window.reviewExam = function() {
+            isReviewMode = true; currentSlide = 1; updateUI();
+            
+            const tb = document.getElementById('timerBadge');
+            tb.style.display = 'flex'; tb.className = 'badge badge-progress'; tb.innerText = "🔍 وضع المراجعة";
+            
+            document.querySelectorAll('.quiz-container').forEach(qc => {
+                let idx = qc.getAttribute('data-q-index');
+                let grid = qc.querySelector('.options-grid');
+                grid.classList.add('answered');
+                
+                grid.querySelectorAll('.option-btn').forEach(btn => {
+                    let isCorr = btn.getAttribute('data-correct') === 'true';
+                    let isSel = btn.classList.contains('selected-neutral');
+                    btn.classList.remove('selected-neutral');
+                    
+                    if(isCorr) btn.classList.add('actual-correct');
+                    if(isSel && !isCorr) btn.classList.add('selected-wrong');
+                    if(isSel && isCorr) btn.classList.add('selected-correct');
+                });
+            });
+
+            if(!document.getElementById('btn-back-result')) {
+                let btn = document.createElement('button'); btn.id = 'btn-back-result'; btn.className = 'nav-btn primary';
+                btn.innerText = '🏆 العودة للنتيجة'; btn.onclick = () => { currentSlide = 10; updateUI(); };
+                document.querySelector('#mainUiBar div:last-child').prepend(btn);
+            } else { document.getElementById('btn-back-result').style.display = 'block'; }
+        }
+
+        window.exitToHome = function() { location.reload(); }
+
+        function drawCertificate(name, perc, tot, max) {
+            const cvs = document.getElementById('certCanvas');
+            const ctx = cvs.getContext('2d');
+            
+            let grad = ctx.createLinearGradient(0,0, cvs.width, cvs.height);
+            grad.addColorStop(0, '#0f2027'); grad.addColorStop(0.5, '#203a43'); grad.addColorStop(1, '#2c5364');
+            ctx.fillStyle = grad; ctx.fillRect(0,0, cvs.width, cvs.height);
+
+            ctx.strokeStyle = 'rgba(255,217,61,0.8)'; ctx.lineWidth = 10; ctx.strokeRect(20,20, cvs.width-40, cvs.height-40);
+            ctx.strokeStyle = 'rgba(78, 205, 196, 0.4)'; ctx.lineWidth = 3; ctx.strokeRect(35,35, cvs.width-70, cvs.height-70);
+
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            
+            ctx.fillStyle = '#FFD93D'; ctx.font = 'bold 55px Arial'; ctx.fillText('شَهَادَةُ تَقْدِيرٍ بِدَرَجَةِ شَرَف', cvs.width/2, 100);
+            ctx.fillStyle = '#FFF'; ctx.font = '26px Arial'; ctx.fillText('بكل فخر واعتزاز، نمنح هذه الشهادة للطالب البطل:', cvs.width/2, 180);
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.beginPath(); ctx.roundRect(150, 220, 600, 90, 20); ctx.fill();
+            ctx.fillStyle = '#4ECDC4'; ctx.font = 'bold 50px Arial'; ctx.fillText(name, cvs.width/2, 265);
+
+            ctx.fillStyle = '#EEE'; ctx.font = '24px Arial'; ctx.fillText('لاجتيازه اختبار الفهم القرائي (أسطورة مصرية - البطل أحمد المنسي)', cvs.width/2, 360);
+            ctx.fillStyle = '#FFD93D'; ctx.font = 'bold 40px Arial'; ctx.fillText(`بنسبة نجاح: %${perc} (${tot}/${max})`, cvs.width/2, 430);
+
+            ctx.fillStyle = '#AAA'; ctx.font = '20px Arial'; 
+            ctx.fillText(`تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`, 250, 520);
+            ctx.fillText(`إمضاء المعلم: أ/ محمود أبو جمعة`, 650, 520);
+
+            cvs.style.display = 'block'; document.getElementById('btnDownloadCert').style.display = 'block';
+        }
+        window.downloadCertificate = function() {
+            let link = document.createElement('a'); link.download = `Pro_Cert_${studentName}.png`;
+            link.href = document.getElementById('certCanvas').toDataURL(); link.click();
+        }
+
+        function startConfetti() {
+            const cvs = document.getElementById('confetti-canvas'); const ctx = cvs.getContext('2d');
+            cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+            let pts = []; const colors = ['#FFD93D', '#4ECDC4', '#FF6B6B', '#FFF'];
+            for(let i=0; i<150; i++) pts.push({ x: Math.random()*cvs.width, y: Math.random()*cvs.height - cvs.height, w: Math.random()*12+5, h: Math.random()*12+5, c: colors[Math.floor(Math.random()*colors.length)], s: Math.random()*4+2, r: Math.random()*360, sp: Math.random()*0.2-0.1 });
+            function anim() {
+                ctx.clearRect(0,0, cvs.width, cvs.height); let active = false;
+                for(let p of pts) {
+                    p.y += p.s; p.r += p.sp;
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+                    if(p.y < cvs.height) active = true;
+                }
+                if(active) requestAnimationFrame(anim); else ctx.clearRect(0,0, cvs.width, cvs.height);
+            }
+            anim();
+        }
+
+        window.openTeacherLogin = function() { showModal('teacherLoginModal'); document.getElementById('t-error').style.display='none'; }
+        window.closeTeacherLogin = function() { hideModal('teacherLoginModal'); }
+        
+        window.verifyTeacher = function() {
+            if(document.getElementById('t-username').value === 'محمود' && document.getElementById('t-password').value === '14252') {
+                closeTeacherLogin(); document.getElementById('mainUiBar').style.display='none';
+                
+                document.getElementById('setting-duration').value = examSettings.duration;
+                document.getElementById('setting-start').value = examSettings.startTime || "";
+                document.getElementById('setting-end').value = examSettings.endTime || "";
+
+                currentSlide = 11; updateUI(); 
+                window.refreshMonitor();
+            } else { document.getElementById('t-error').style.display = 'block'; }
+        }
+        window.logoutTeacher = function() { location.reload(); }
+
+        window.saveExamSettings = async function() {
+            if(!currentUser) return;
+            let d = document.getElementById('setting-duration').value;
+            let s = document.getElementById('setting-start').value;
+            let e = document.getElementById('setting-end').value;
+            
+            let newSettings = {
+                duration: parseInt(d) || 15,
+                startTime: s,
+                endTime: e
+            };
+            
+            try {
+                await setDoc(settingsDocRef, newSettings);
+                let msg = document.getElementById('settings-msg');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+            } catch (err) {
+                console.error("Error saving settings to cloud", err);
+            }
+        }
+
+        window.generateStudentCode = async function() {
+            if(!currentUser) return;
+            let n = document.getElementById('new-student-name');
+            if(!n.value.trim()) return;
+            
+            let names = n.value.split('\n'); 
+            
+            for(let name of names) {
+                let cleanName = name.trim();
+                if(cleanName) {
+                    let code;
+                    do { code = Math.floor(10000 + Math.random()*90000).toString(); } while(studentsListCache.find(x=>x.code===code));
+                    
+                    let newStudent = { 
+                        name: cleanName, 
+                        code: code, 
+                        status: "لم يبدأ", 
+                        answered: 0, 
+                        score: "-", 
+                        cheatAttempts: 0 
+                    };
+                    
+                    try {
+                        const studentDoc = doc(db, 'artifacts', appId, 'public', 'data', 'students', code);
+                        await setDoc(studentDoc, newStudent);
+                    } catch (e) { console.error("Error adding student", e); }
+                }
+            }
+            n.value = ""; 
+        }
+
+        window.resetStudent = async function(code) {
+            if(!currentUser) return;
+            const studentDoc = doc(db, 'artifacts', appId, 'public', 'data', 'students', code);
+            try {
+                await updateDoc(studentDoc, { status: "لم يبدأ", answered: 0, score: "-", cheatAttempts: 0 });
+            } catch (e) { console.error("Reset Error", e); }
+        }
+        
+        window.deleteStudent = async function(code) { 
+            if(!currentUser) return;
+            const studentDoc = doc(db, 'artifacts', appId, 'public', 'data', 'students', code);
+            try {
+                await deleteDoc(studentDoc);
+            } catch (e) { console.error("Delete Error", e); }
+        }
+
+        window.refreshMonitor = function() {
+            let tbody = document.getElementById('students-monitor-body'); tbody.innerHTML = "";
+            studentsListCache.forEach(s => {
+                let cheatHtml = s.cheatAttempts > 0 ? `<br><span class="cheat-warning">⚠️ غادر ${s.cheatAttempts} مرات</span>` : '';
+                let statusColor = s.status==="انتهى" ? "var(--primary)" : (s.status==="قيد الاختبار" ? "var(--secondary)" : "#aaa");
+                tbody.innerHTML += `<tr>
+                    <td>${s.name}</td>
+                    <td style="font-weight:bold; letter-spacing:2px; color:var(--secondary);">${s.code}</td>
+                    <td style="color:${statusColor}; font-weight:bold;">${s.status}</td>
+                    <td>${s.answered}/${totalQuestions} ${cheatHtml}</td>
+                    <td style="font-weight:bold; font-size:16pt;">${s.score}</td>
+                    <td>
+                        <button onclick="resetStudent('${s.code}')" style="background:#FFD93D; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">إعادة</button>
+                        <button onclick="deleteStudent('${s.code}')" style="background:var(--danger); border:none; padding:5px 10px; border-radius:5px; color:#fff; cursor:pointer;">حذف</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        window.printStudentsList = function() {
+            let printWin = window.open('', '_blank');
+            let html = `<html dir="rtl"><head><title>كشف الأرقام</title><style>body{font-family:Arial; text-align:center;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #000; padding:10px; font-size:18pt;}</style></head><body><h2>كشف أرقام جلوس (البطل أحمد المنسي)</h2><table><tr><th>الاسم</th><th>رقم الجلوس</th></tr>`;
+            studentsListCache.forEach(s => html += `<tr><td>${s.name}</td><td>${s.code}</td></tr>`);
+            html += `</table></body></html>`;
+            printWin.document.write(html); printWin.document.close();
+            setTimeout(()=>printWin.print(), 500);
+        }
+
+        window.onload = function() { 
+            setupQuizzes(); 
+            updateUI(); 
+            authenticate(); // بدء الاتصال بـ Firebase عند تحميل الصفحة
+        };
+    </script>
+</body>
+</html>
